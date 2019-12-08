@@ -35,6 +35,8 @@
         <module>whoami-svc</module>
         <module>web-app</module>
         <module>faraday</module>
+        <module>nontice-api</module>
+        <module>notice-svc</module>
     </modules>
 
     <dependencyManagement>
