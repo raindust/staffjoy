@@ -30,6 +30,8 @@ import xyz.staffjoy.common.error.ServiceException;
 import xyz.staffjoy.common.utils.Helper;
 import xyz.staffjoy.mail.client.MailClient;
 import xyz.staffjoy.mail.dto.EmailRequest;
+import xyz.staffjoy.notice.client.NoticeClient;
+import xyz.staffjoy.notice.dto.NoticeRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -56,6 +58,8 @@ public class AccountService {
     private final EnvConfig envConfig;
 
     private final MailClient mailClient;
+
+    private final NoticeClient noticeClient;
 
     private final ServiceHelper serviceHelper;
 
@@ -408,16 +412,16 @@ public class AccountService {
             htmlBody = String.format(template, link.toString(), link.toString());
         }
 
-        EmailRequest emailRequest = EmailRequest.builder()
+        NoticeRequest noticeRequest = NoticeRequest.builder()
                 .to(email)
                 .name(name)
                 .subject(subject)
-                .htmlBody(htmlBody)
+                .content(htmlBody)
                 .build();
 
         BaseResponse baseResponse = null;
         try {
-            baseResponse = mailClient.send(emailRequest);
+            baseResponse = noticeClient.send(noticeRequest);
         } catch (Exception ex) {
             String errMsg = "Unable to send email";
             serviceHelper.handleException(logger, ex, errMsg);

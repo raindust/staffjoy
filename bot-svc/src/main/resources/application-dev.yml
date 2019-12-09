@@ -6,6 +6,7 @@ staffjoy:
   sms-service-endpoint: http://localhost:8089
   company-service-endpoint: http://localhost:8082
   account-service-endpoint: http://localhost:8081
+  notice-service-endpoint: http://localhost:8888
 
 management:
   endpoints:

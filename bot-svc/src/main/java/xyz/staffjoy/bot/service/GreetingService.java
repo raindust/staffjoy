@@ -25,6 +25,9 @@ public class GreetingService {
             case DISPATCH_EMAIL:
                 helperService.mailGreetingAsync(account);
                 break;
+            case DISPATCH_NOTICE:
+                helperService.noticeGreetingAsync(account);
+                break;
             default:
                 logger.info("Unable to send greeting to user %s - no comm method found", userId);
         }

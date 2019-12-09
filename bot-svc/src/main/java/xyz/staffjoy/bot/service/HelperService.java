@@ -22,6 +22,8 @@ import xyz.staffjoy.company.dto.CompanyDto;
 import xyz.staffjoy.company.dto.GenericCompanyResponse;
 import xyz.staffjoy.mail.client.MailClient;
 import xyz.staffjoy.mail.dto.EmailRequest;
+import xyz.staffjoy.notice.client.NoticeClient;
+import xyz.staffjoy.notice.dto.NoticeRequest;
 import xyz.staffjoy.sms.client.SmsClient;
 import xyz.staffjoy.sms.dto.SmsRequest;
 
@@ -47,6 +49,9 @@ public class HelperService {
 
     @Autowired
     MailClient mailClient;
+
+    @Autowired
+    NoticeClient noticeClient;
 
     @Autowired
     AccountClient accountClient;
@@ -79,16 +84,16 @@ public class HelperService {
 
     DispatchPreference getPreferredDispatch(AccountDto account) {
         if (appProps.isForceEmailPreference()) {
-            return DispatchPreference.DISPATCH_EMAIL;
+            return DispatchPreference.DISPATCH_NOTICE;
         }
         // todo - check user notification preferences
         if (!StringUtils.isEmpty(account.getPhoneNumber())) {
             return DispatchPreference.DISPATCH_SMS;
         }
-        if (!StringUtils.isEmpty(account.getEmail())) {
-            return DispatchPreference.DISPATCH_EMAIL;
-        }
-        return DispatchPreference.DISPATCH_UNAVAILABLE;
+//        if (!StringUtils.isEmpty(account.getEmail())) {
+//            return DispatchPreference.DISPATCH_EMAIL;
+//        }
+        return DispatchPreference.DISPATCH_NOTICE;
     }
 
     AccountDto getAccountById(String userId) {
@@ -127,6 +132,30 @@ public class HelperService {
         return response.getCompany();
     }
 
+    void sendNotice(String to, String name, String subject, String content) {
+        NoticeRequest emailRequest = NoticeRequest.builder()
+                .to(to)
+                .name(name)
+                .subject(subject)
+                .content(content)
+                .build();
+
+        BaseResponse baseResponse = null;
+        try {
+            baseResponse = noticeClient.send(emailRequest);
+        } catch (Exception ex) {
+            String errMsg = "Unable to send email";
+            logger.error(errMsg, ex);
+            sentryClient.sendException(ex);
+            throw new ServiceException(errMsg, ex);
+        }
+        if (!baseResponse.isSuccess()) {
+            logger.error(baseResponse.getMessage());
+            sentryClient.sendMessage(baseResponse.getMessage());
+            throw new ServiceException(baseResponse.getMessage());
+        }
+    }
+
     void sendMail(String email, String name, String subject, String htmlBody) {
         EmailRequest emailRequest = EmailRequest.builder()
                 .to(email)
@@ -149,7 +178,6 @@ public class HelperService {
             sentryClient.sendMessage(baseResponse.getMessage());
             throw new ServiceException(baseResponse.getMessage());
         }
-
     }
 
     void sendSms(String phoneNumber, String templateCode, String templateParam) {
@@ -192,6 +220,15 @@ public class HelperService {
     }
 
     @Async(AppConfig.ASYNC_EXECUTOR_NAME)
+    void noticeGreetingAsync(AccountDto accountDto) {
+        String email = accountDto.getEmail();
+        String name = accountDto.getName();
+        String subject = "Staffjoy Greeting";
+        String htmlBody = BotConstant.GREETING_EMAIL_TEMPLATE;
+        this.sendNotice(email, name, subject, htmlBody);
+    }
+
+    @Async(AppConfig.ASYNC_EXECUTOR_NAME)
     void mailOnBoardAsync(AccountDto account, CompanyDto companyDto) {
         URI icalURI = null;
         try {
@@ -215,6 +252,29 @@ public class HelperService {
         logger.info(String.format("onboarded worker %s (%s) for company %s (%s)", account.getId(), account.getName(), companyDto.getId(), companyDto.getName()));
     }
 
+    @Async(AppConfig.ASYNC_EXECUTOR_NAME)
+    void noticeOnBoardAsync(AccountDto account, CompanyDto companyDto) {
+        URI icalURI = null;
+        try {
+            icalURI = new URI(envConfig.getScheme(), "ical." + envConfig.getExternalApex(), String.format("/%s.ics", account.getId()), null);
+        } catch (URISyntaxException e) {
+            throw new ServiceException("Fail to build URI", e);
+        }
+
+        String greet = HelperService.getGreet(HelperService.getFirstName(account.getName()));
+        String companyName = companyDto.getName();
+        String icalUrl = icalURI.toString();
+        String email = account.getEmail();
+        String name = account.getName();
+
+        String htmlBody = String.format(BotConstant.ONBOARDING_EMAIL_TEMPLATE, greet, companyName, icalUrl);
+        String subject = "Onboarding Message";
+
+        this.sendNotice(email, name, subject, htmlBody);
+
+        // todo - check if upcoming shifts, and if there are - send them
+        logger.info(String.format("onboarded worker %s (%s) for company %s (%s)", account.getId(), account.getName(), companyDto.getId(), companyDto.getName()));
+    }
 
     @Async(AppConfig.ASYNC_EXECUTOR_NAME)
     void smsOnboardAsync(AccountDto account, CompanyDto companyDto) {
@@ -249,7 +309,7 @@ public class HelperService {
         }};
 
 
-        for(Map.Entry<String, String> entry : onboardingMessageMap.entrySet()) {
+        for (Map.Entry<String, String> entry : onboardingMessageMap.entrySet()) {
             String templateCode = entry.getKey();
             String templateParam = entry.getValue();
 

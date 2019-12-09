@@ -59,7 +59,15 @@ public class AlertService {
         String greet = HelperService.getGreet(account.getName());
         String companyName = companyDto.getName();
 
-        if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
+        if (dispatchPreference == dispatchPreference.DISPATCH_NOTICE) {
+            String content = String.format(BotConstant.ALERT_NEW_SHIFT_EMAIL_TEMPLATE,
+                    greet, companyName, jobName, newShiftMsg);
+            String subject = "New Shift Alert";
+            String email = account.getEmail();
+            String name = account.getName();
+
+            helperService.sendNotice(email, name, subject, content);
+        } else if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
             String htmlBody = String.format(BotConstant.ALERT_NEW_SHIFT_EMAIL_TEMPLATE,
                     greet, companyName, jobName, newShiftMsg);
             String subject = "New Shift Alert";
@@ -121,7 +129,15 @@ public class AlertService {
         String companyName = companyDto.getName();
         int numberOfShifts = shiftDtos.size();
 
-        if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
+        if (dispatchPreference == DispatchPreference.DISPATCH_NOTICE) {
+            String htmlBody = String.format(BotConstant.ALERT_NEW_SHIFTS_EMAIL_TEMPLATE,
+                    greet, companyName, numberOfShifts, newShiftsMsg);
+            String subject = "New Shifts Alert";
+            String email = account.getEmail();
+            String name = account.getName();
+
+            helperService.sendNotice(email, name, subject, htmlBody);
+        } else if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
             String htmlBody = String.format(BotConstant.ALERT_NEW_SHIFTS_EMAIL_TEMPLATE,
                     greet, companyName, numberOfShifts, newShiftsMsg);
             String subject = "New Shifts Alert";
@@ -178,7 +194,15 @@ public class AlertService {
         String greet = HelperService.getGreet(account.getName());
         String companyName = companyDto.getName();
 
-        if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
+        if (dispatchPreference == DispatchPreference.DISPATCH_NOTICE) {
+            String htmlBody = String.format(BotConstant.ALERT_REMOVED_SHIFT_EMAIL_TEMPLATE,
+                    greet, companyName, newShiftsMsg);
+            String subject = "Removed Shift Alert";
+            String email = account.getEmail();
+            String name = account.getName();
+
+            helperService.sendNotice(email, name, subject, htmlBody);
+        } else if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
             String htmlBody = String.format(BotConstant.ALERT_REMOVED_SHIFT_EMAIL_TEMPLATE,
                     greet, companyName, newShiftsMsg);
             String subject = "Removed Shift Alert";
@@ -239,7 +263,15 @@ public class AlertService {
         String companyName = companyDto.getName();
         int numberOfShifts = shiftDtos.size();
 
-        if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
+        if (dispatchPreference == DispatchPreference.DISPATCH_NOTICE) {
+            String htmlBody = String.format(BotConstant.ALERT_REMOVED_SHIFTS_EMAIL_TEMPLATE,
+                    greet, companyName, numberOfShifts, newShiftsMsg);
+            String subject = "Removed Shifts Alert";
+            String email = account.getEmail();
+            String name = account.getName();
+
+            helperService.sendNotice(email, name, subject, htmlBody);
+        } else if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
             String htmlBody = String.format(BotConstant.ALERT_REMOVED_SHIFTS_EMAIL_TEMPLATE,
                     greet, companyName, numberOfShifts, newShiftsMsg);
             String subject = "Removed Shifts Alert";
@@ -296,7 +328,15 @@ public class AlertService {
         String greet = HelperService.getGreet(account.getName());
         String companyName = companyDto.getName();
 
-        if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
+        if (dispatchPreference == DispatchPreference.DISPATCH_NOTICE) {
+            String htmlBody = String.format(BotConstant.ALERT_CHANGED_SHIFT_EMAIL_TEMPLATE,
+                    greet, companyName, oldShiftMsg, newShiftMsg);
+            String subject = "Changed Shift Alert";
+            String email = account.getEmail();
+            String name = account.getName();
+
+            helperService.sendNotice(email, name, subject, htmlBody);
+        } else if (dispatchPreference == DispatchPreference.DISPATCH_EMAIL) {
             String htmlBody = String.format(BotConstant.ALERT_CHANGED_SHIFT_EMAIL_TEMPLATE,
                     greet, companyName, oldShiftMsg, newShiftMsg);
             String subject = "Changed Shift Alert";

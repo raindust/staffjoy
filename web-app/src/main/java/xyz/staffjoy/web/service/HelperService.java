@@ -15,6 +15,8 @@ import xyz.staffjoy.common.error.ServiceException;
 import xyz.staffjoy.company.dto.CompanyDto;
 import xyz.staffjoy.mail.client.MailClient;
 import xyz.staffjoy.mail.dto.EmailRequest;
+import xyz.staffjoy.notice.client.NoticeClient;
+import xyz.staffjoy.notice.dto.NoticeRequest;
 import xyz.staffjoy.web.config.AppConfig;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +38,9 @@ public class HelperService {
 
     @Autowired
     MailClient mailClient;
+
+    @Autowired
+    NoticeClient noticeClient;
 
     public static boolean isPost(HttpServletRequest request) {
         return METHOD_POST.equals(request.getMethod());
@@ -75,11 +80,11 @@ public class HelperService {
 
     @Async(AppConfig.ASYNC_EXECUTOR_NAME)
     public void sendEmailAsync(AccountDto a, CompanyDto c) {
-        EmailRequest emailRequest = EmailRequest.builder()
+        NoticeRequest noticeRequest = NoticeRequest.builder()
                 .to("sales@staffjoy.xyz")
                 .name("")
                 .subject(String.format("%s from %s just joined Staffjoy", a.getName(), c.getName()))
-                .htmlBody(String.format("Name: %s<br>Phone: %s<br>Email: %s<br>Company: %s<br>App: https://app.staffjoy.com/#/companies/%s/employees/",
+                .content(String.format("Name: %s<br>Phone: %s<br>Email: %s<br>Company: %s<br>App: https://app.staffjoy.com/#/companies/%s/employees/",
                         a.getName(),
                         a.getPhoneNumber(),
                         a.getEmail(),
@@ -89,7 +94,7 @@ public class HelperService {
 
         BaseResponse baseResponse = null;
         try {
-            baseResponse = mailClient.send(emailRequest);
+            baseResponse = noticeClient.send(noticeRequest);
         } catch (Exception ex) {
             String errMsg = "Unable to send email";
             logException(logger, ex, errMsg);

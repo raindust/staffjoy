@@ -46,6 +46,11 @@
             <artifactId>mail-api</artifactId>
             <version>1.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>xyz.staffjoy</groupId>
+            <artifactId>notice-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

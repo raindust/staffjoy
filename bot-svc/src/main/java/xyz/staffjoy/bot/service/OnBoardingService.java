@@ -28,6 +28,9 @@ public class OnBoardingService {
             case DISPATCH_EMAIL:
                 helperService.mailOnBoardAsync(account, companyDto);
                 break;
+            case DISPATCH_NOTICE:
+                helperService.noticeOnBoardAsync(account, companyDto);
+                break;
             default:
                 logger.info("Unable to onboard user %s - no comm method found", req.getUserId());
         }
