@@ -12,6 +12,7 @@ services:
       - EMAIL_SERVICE_ENDPOINT
       - COMPANY_SERVICE_ENDPOINT
       - BOT_SERVICE_ENDPOINT
+      - NOTICE_SERVICE_ENDPOINT
       - INTERCOM_ACCESS_TOKEN
       - ACCOUNT_DATASOURCE_URL
       - ACCOUNT_DATASOURCE_USERNAME
@@ -19,6 +20,7 @@ services:
     depends_on:
       - bot-service
       - email-service
+      - notice-service
     networks:
       - internal_access
       - external_access # db access
@@ -34,12 +36,14 @@ services:
       - EMAIL_SERVICE_ENDPOINT
       - ACCOUNT_SERVICE_ENDPOINT
       - BOT_SERVICE_ENDPOINT
+      - NOTICE_SERVICE_ENDPOINT
       - COMPANY_DATASOURCE_URL
       - COMPANY_DATASOURCE_USERNAME
       - COMPANY_DATASOURCE_PASSWORD
     depends_on:
       - bot-service
       - email-service
+      - notice-service
     networks:
       - internal_access
       - external_access # db access
@@ -55,8 +59,10 @@ services:
       - ACCOUNT_SERVICE_ENDPOINT
       - COMPANY_SERVICE_ENDPOINT
       - SMS_SERVICE_ENDPOINT
+      - NOTICE_SERVICE_ENDPOINT
     depends_on:
       - email-service
+      - notice-service
   #      - sms-svc # commented for demo
     networks:
       - internal_access
@@ -73,6 +79,21 @@ services:
     networks:
       - internal_access
       - external_access # aliyun access
+
+  notice-service:
+    build: ./notice-svc
+    image: boboweike/notice-svc
+    environment:
+      - SPRING_PROFILES_ACTIVE
+      - SERVER_PORT
+      - SENTRY_DSN
+      - SIGNING_SECRET
+      - NOTICE_DATASOURCE_URL
+      - NOTICE_DATASOURCE_USERNAME
+      - NOTICE_DATASOURCE_PASSWORD
+    networks:
+      - internal_access
+      - external_access # db access
 
 # commented for demo
 #  sms-service:
@@ -118,12 +139,14 @@ services:
       - ACCOUNT_SERVICE_ENDPOINT
       - COMPANY_SERVICE_ENDPOINT
       - EMAIL_SERVICE_ENDPOINT
+      - NOTICE_SERVICE_ENDPOINT
       - RECAPTCHA_PUBLIC
       - RECAPTCHA_PRIVATE
     depends_on:
       - account-service
       - company-service
       - email-service
+      - notice-service
     networks:
       - internal_access
 

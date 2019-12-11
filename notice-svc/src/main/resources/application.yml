@@ -6,13 +6,17 @@ spring:
   application:
     name: notice-service
   datasource:
-    url: ${ACCOUNT_DATASOURCE_URL}
-    username: ${ACCOUNT_DATASOURCE_USERNAME}
-    password: ${ACCOUNT_DATASOURCE_PASSWORD}
+    url: ${NOTICE_DATASOURCE_URL}
+    username: ${NOTICE_DATASOURCE_USERNAME}
+    password: ${NOTICE_DATASOURCE_PASSWORD}
     tomcat:
       test-while-idle: true
       validation-query: SELECT 1
   jpa:
     hibernate:
       ddl-auto: validate
-
+staffjoy:
+  common:
+    sentry-dsn: ${SENTRY_DSN}
+    deploy-env: ${DEPLOY:V2}
+  signing-secret: ${SIGNING_SECRET}
