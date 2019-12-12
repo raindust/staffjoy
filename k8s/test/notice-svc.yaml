@@ -1,0 +1,36 @@
+# https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-apiversion-definition-guide.html
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: notice-svc-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: notice-svc
+        env: test
+    spec:
+      containers:
+        - name: notice-svc
+          image: boboweike/notice-svc
+          imagePullPolicy: Never
+          ports:
+            - name: http-port
+              containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: common-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notice-service
+spec:
+  selector:
+    app: notice-svc
+    env: test
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80

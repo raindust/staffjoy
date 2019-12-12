@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-spa-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-svc
+  template:
+    metadata:
+      labels:
+        app: app-svc
+        env: test
+    spec:
+      containers:
+        - name: app-spa
+          image: boboweike/app-spa
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+              name: http-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  selector:
+    app: app-svc
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP

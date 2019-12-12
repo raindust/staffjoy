@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: www-web-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: www-svc
+  template:
+    metadata:
+      labels:
+        app: www-svc
+        evn: test
+    spec:
+      containers:
+        - name: www-svc
+          image: boboweike/www-svc
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+              name: http-port
+          envFrom:
+            - configMapRef:
+                name: common-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: www-service
+spec:
+  selector:
+    app: www-svc
+    env: test
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

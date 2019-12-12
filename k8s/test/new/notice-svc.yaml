@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notice-svc-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notice-svc
+  template:
+    metadata:
+      labels:
+        app: notice-svc
+        env: test
+    spec:
+      containers:
+        - name: notice-svc
+          image: boboweike/notice-svc
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+              name: http-port
+          envFrom:
+            - configMapRef:
+                name: common-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notice-service
+spec:
+  selector:
+    app: notice-svc
+    env: test
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
